@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -8,7 +7,7 @@ class WeatherRequest extends FormRequest
 {
     public function authorize()
     {
-        return true; 
+        return true; // não há necessidade de autenticação aqui
     }
 
     public function rules()
@@ -21,9 +20,9 @@ class WeatherRequest extends FormRequest
     public function messages()
     {
         return [
-            'cidade.required' => 'Você deve informar o nome de uma cidade.',
-            'cidade.string'   => 'O nome da cidade precisa ser um texto válido.',
-            'cidade.max'      => 'O nome da cidade não pode ter mais de 100 caracteres.',
+            'cidade.required' => 'Informe o nome de uma cidade.',
+            'cidade.string'   => 'Valor inválido para cidade.',
+            'cidade.max'      => 'O nome da cidade é muito extenso.',
         ];
     }
 

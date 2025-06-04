@@ -24,12 +24,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'weather' => [
-        'base_url' => env('WEATHER_BASE_URL', 'https://api.openweathermap.org/data/2.5'),
-        'api_key'  => env('WEATHER_API_KEY'),
-        'lang'     => 'pt_br',
-        'units'    => 'metric',
-    ],
+   'weather' => [
+    'base_url' => env('WEATHER_BASE_URL', 'https://api.weatherapi.com/v1'),
+    'api_key'  => env('WEATHER_API_KEY'),
+    'lang'     => env('WEATHER_LANG', 'pt'),
+],
 
 
     'resend' => [

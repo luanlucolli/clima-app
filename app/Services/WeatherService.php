@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
@@ -9,60 +8,79 @@ use Illuminate\Http\Client\RequestException;
 class WeatherService
 {
     /**
-     * Retorna dados meteorológicos de uma cidade brasileira.
+     * Busca o clima atual de uma cidade no WeatherAPI.com.
      *
-     * @param string $city
-     * @return array|null
-     * @throws \Exception em caso de erro não tratado pela API
+     * @param string $city  Nome da cidade (ex: "São Paulo, SP" ou apenas "Curitiba")
+     * @return array|null   Dados normalizados ou null se cidade não existir
+     * @throws \Exception   Em caso de erro inesperado na API
      */
     public function getWeatherByCity(string $city): ?array
     {
-        // remove espaços em excesso
-        $city = trim($city);
+        // Normaliza o nome (trim + remove múltiplos espaços)
+        $cityParam = trim(preg_replace('/\s+/', ' ', $city));
 
-        // chave única para cache, pra evitar chamadas repetidas em pouco tempo
-        $cacheKey = 'weather_' . strtolower(str_replace(' ', '_', $city));
+        // Chave de cache única por cidade (TTL: 10 minutos)
+        $cacheKey = "weatherapi_city_" . strtolower(str_replace(' ', '_', $cityParam));
 
-        // Tenta recuperar do cache (duração: 10 minutos)
-        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($city) {
+        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($cityParam) {
             $baseUrl = config('services.weather.base_url');
             $apiKey  = config('services.weather.api_key');
-            $lang    = config('services.weather.lang', 'pt_br');
-            $units   = config('services.weather.units', 'metric');
+            $lang    = config('services.weather.lang', 'pt');
+
+            // Monta a URL completa: https://api.weatherapi.com/v1/current.json
+            $endpoint = $baseUrl . '/current.json';
 
             try {
                 $response = Http::timeout(5)
-                    ->get($baseUrl . '/weather', [
-                        'q'     => "{$city},BR",
-                        'appid' => $apiKey,
-                        'units' => $units,
-                        'lang'  => $lang,
+                    ->get($endpoint, [
+                        'key' => $apiKey,
+                        'q'   => $cityParam,  // pode ser "Cidade" ou "Cidade, Estado"
+                        'lang'=> $lang,       // define idioma da descrição
                     ]);
 
-                $response->throw(); 
-            } catch (RequestException $e) {
-                // Se for 404 (cidade não encontrada), retorna null
-                if ($e->response && $e->response->status() === 404) {
+                // Se retornar erro HTTP (4xx ou 5xx), lança exceção
+                $response->throw();
+            }
+            catch (RequestException $e) {
+                // Se for erro 400/401/403/404 do WeatherAPI:
+                $status = $e->response ? $e->response->status() : null;
+
+                // 400 ou 1006 (cidade não encontrada) – devolve null
+                if ($status === 400 || $status === 401 || $status === 403 || $status === 404) {
                     return null;
                 }
-               
-                throw new \Exception('Erro ao acessar API de clima: ' . $e->getMessage());
+                // Para outros erros, relança exceção para ser tratado mais acima
+                throw new \Exception("Erro na API WeatherAPI.com: " . $e->getMessage());
             }
 
-            $data = $response->json();
+            $json = $response->json();
 
-            // normaliza dados retornados
+            // Se o JSON não tiver a chave ‘current’, consideramos que não há dados
+            if (!isset($json['current']) || !isset($json['location'])) {
+                return null;
+            }
+
+            // Normaliza os campos que usaremos na view
             return [
-                'cidade'       => $data['name']      ?? $city,
-                'pais'         => $data['sys']['country'] ?? 'BR',
-                'temperatura'  => $data['main']['temp']       ?? null,
-                'sensacao'     => $data['main']['feels_like'] ?? null,
-                'temp_min'     => $data['main']['temp_min']   ?? null,
-                'temp_max'     => $data['main']['temp_max']   ?? null,
-                'umidade'      => $data['main']['humidity']   ?? null,
-                'descricao'    => $data['weather'][0]['description'] ?? null,
-                'icone'        => $data['weather'][0]['icon']        ?? null,
-                'timestamp'    => $data['dt']            ?? null,
+                // Informação de localização
+                'name'         => $json['location']['name'] ?? $cityParam,
+                'region'       => $json['location']['region'] ?? '',
+                'country'      => $json['location']['country'] ?? '',
+                'localtime'    => $json['location']['localtime'] ?? null,
+
+                // Dados meteorológicos atuais
+                'temp_c'       => $json['current']['temp_c'] ?? null,
+                'feelslike_c'  => $json['current']['feelslike_c'] ?? null,
+                'humidity'     => $json['current']['humidity'] ?? null,
+                'wind_kph'     => $json['current']['wind_kph'] ?? null,
+                'cloud'        => $json['current']['cloud'] ?? null,
+
+                // Descrição e ícone de condição do tempo
+                // O campo ‘icon’ vem como “//cdn.weatherapi.com/…”
+                'condition_text' => $json['current']['condition']['text'] ?? null,
+                'condition_icon' => isset($json['current']['condition']['icon'])
+                                    ? 'https:' . $json['current']['condition']['icon']
+                                    : null,
             ];
         });
     }
