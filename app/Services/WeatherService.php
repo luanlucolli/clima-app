@@ -4,6 +4,8 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Client\RequestException;
+// 1) Importar Str para remover acentos
+use Illuminate\Support\Str;
 
 class WeatherService
 {
@@ -16,8 +18,10 @@ class WeatherService
      */
     public function getWeatherByCity(string $city): ?array
     {
-        // Normaliza o nome (trim + remove múltiplos espaços)
-        $cityParam = trim(preg_replace('/\s+/', ' ', $city));
+        // 2) Remover múltiplos espaços e fazer trim
+        $normalized = trim(preg_replace('/\s+/', ' ', $city));
+        // 3) Remover acentos/diacríticos (belem → belem, pará → para, etc.)
+        $cityParam = Str::ascii($normalized);
 
         // Chave de cache única por cidade (TTL: 10 minutos)
         $cacheKey = "weatherapi_city_" . strtolower(str_replace(' ', '_', $cityParam));
@@ -34,49 +38,40 @@ class WeatherService
                 $response = Http::timeout(5)
                     ->get($endpoint, [
                         'key' => $apiKey,
-                        'q'   => $cityParam,  // pode ser "Cidade" ou "Cidade, Estado"
-                        'lang'=> $lang,       // define idioma da descrição
+                        'q'   => $cityParam,  // já sem acentos, ex: “belem, para, Brazil”
+                        'lang'=> $lang,
                     ]);
 
                 // Se retornar erro HTTP (4xx ou 5xx), lança exceção
                 $response->throw();
             }
             catch (RequestException $e) {
-                // Se for erro 400/401/403/404 do WeatherAPI:
                 $status = $e->response ? $e->response->status() : null;
 
-                // 400 ou 1006 (cidade não encontrada) – devolve null
+                // 400/401/403/404 – devolve null para “cidade não encontrada”
                 if ($status === 400 || $status === 401 || $status === 403 || $status === 404) {
                     return null;
                 }
-                // Para outros erros, relança exceção para ser tratado mais acima
                 throw new \Exception("Erro na API WeatherAPI.com: " . $e->getMessage());
             }
 
             $json = $response->json();
 
-            // Se o JSON não tiver a chave ‘current’, consideramos que não há dados
             if (!isset($json['current']) || !isset($json['location'])) {
                 return null;
             }
 
-            // Normaliza os campos que usaremos na view
+            // Normaliza os campos para a view
             return [
-                // Informação de localização
-                'name'         => $json['location']['name'] ?? $cityParam,
-                'region'       => $json['location']['region'] ?? '',
-                'country'      => $json['location']['country'] ?? '',
-                'localtime'    => $json['location']['localtime'] ?? null,
-
-                // Dados meteorológicos atuais
-                'temp_c'       => $json['current']['temp_c'] ?? null,
-                'feelslike_c'  => $json['current']['feelslike_c'] ?? null,
-                'humidity'     => $json['current']['humidity'] ?? null,
-                'wind_kph'     => $json['current']['wind_kph'] ?? null,
-                'cloud'        => $json['current']['cloud'] ?? null,
-
-                // Descrição e ícone de condição do tempo
-                // O campo ‘icon’ vem como “//cdn.weatherapi.com/…”
+                'name'           => $json['location']['name'] ?? $cityParam,
+                'region'         => $json['location']['region'] ?? '',
+                'country'        => $json['location']['country'] ?? '',
+                'localtime'      => $json['location']['localtime'] ?? null,
+                'temp_c'         => $json['current']['temp_c'] ?? null,
+                'feelslike_c'    => $json['current']['feelslike_c'] ?? null,
+                'humidity'       => $json['current']['humidity'] ?? null,
+                'wind_kph'       => $json['current']['wind_kph'] ?? null,
+                'cloud'          => $json['current']['cloud'] ?? null,
                 'condition_text' => $json['current']['condition']['text'] ?? null,
                 'condition_icon' => isset($json['current']['condition']['icon'])
                                     ? 'https:' . $json['current']['condition']['icon']

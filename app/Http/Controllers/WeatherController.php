@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\WeatherRequest;
@@ -28,25 +29,25 @@ class WeatherController extends Controller
      */
     public function search(WeatherRequest $request)
     {
-        $cidadeInput = $request->input('cidade');
+        // Agora lemos os campos ocultos definidos pelo autocomplete
+        $cidade      = $request->input('cidade_selected');
+        $estado      = $request->input('uf_selected');
+        $consulta    = "{$cidade}, {$estado}, Brazil";
 
         try {
-            $dadosClima = $this->weatherService->getWeatherByCity($cidadeInput);
+            $dadosClima = $this->weatherService->getWeatherByCity($consulta);
 
             if (is_null($dadosClima)) {
-                // Se não retornar dados (por exemplo, cidade não encontrada), redireciona com erro
                 return redirect()
                     ->route('weather.index')
-                    ->with('error', "Não foi possível encontrar dados para '{$cidadeInput}'.");
+                    ->with('error', "Não foi possível encontrar dados para '{$cidade}'.");
             }
 
-            // Passa o array de dados para a view results
             return view('weather.results', [
                 'dados' => $dadosClima,
             ]);
         }
         catch (\Exception $e) {
-            // Loga internamente
             logger()->error("Erro ao obter clima: " . $e->getMessage());
             return redirect()
                 ->route('weather.index')
