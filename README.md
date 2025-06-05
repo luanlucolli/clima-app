@@ -6,6 +6,21 @@ Esse projeto foi feito com foco em clareza, simplicidade e boa prática — espe
 
 ---
 
+## Pré-requisitos
+
+Antes de começar, você precisa ter instalado:
+
+- **PHP ≥ 8.1**  
+  - Com extensões básicas habilitadas (pdo, pdo_sqlite, mbstring, json, ctype, tokenizer).  
+- **Composer**  
+  - Para instalar dependências Laravel.  
+- **Node.js (≥ 14) e npm**  
+  - Para instalar e compilar os assets via Vite.  
+- **SQLite** (opcional)  
+  - Usei SQLite por padrão para simplificar o banco; o arquivo `database/database.sqlite` será criado automaticamente.  
+  
+
+
 ## Como rodar tudo em poucos passos
 
 1. **Clone o projeto**  
@@ -86,17 +101,17 @@ Aqui vai um resumo rápido de como tudo está organizado e funcionando:
   - A lista aparece em dropdown logo abaixo do input. Ao clicar em uma sugestão, o nome e o estado são preenchidos em campos escondidos para submeter a busca corretamente.
 
 - **Dados de clima (WeatherAPI)**:  
-  - Escolhemos a **WeatherAPI.com** porque, dentre as APIs testadas, ela oferece cobertura confiável para cidades brasileiras, incluindo casos de nomes duplicados em estados diferentes.  
+  - Escolhi a **WeatherAPI.com** porque, dentre as APIs testadas, ela oferece cobertura confiável para cidades brasileiras, incluindo casos de nomes duplicados em estados diferentes.  
   - Algumas cidades muito pequenas (população < 5k) podem retornar inconsistências ou não aparecer, mas isso é raro e faz parte das limitações do provider de dados gratuitos.  
   - A requisição traz informações como temperatura, sensação térmica, umidade, vento, nuvens, ícone e descrição do clima em português.
 
 - **Frontend e responsividade**:  
-  - Usamos **Bootstrap** para deixar a interface responsiva e simples de estilizar.  
+  - Usei **Bootstrap** para deixar a interface responsiva e simples de estilizar.  
   - Os assets (CSS e JS) são compilados pelo **Vite**, sem configurações extras.  
   - O template principal está em `resources/views/layouts/app.blade.php` e a view de busca/resultados em `resources/views/weather/index.blade.php`.
 
 - **Banco de dados**:  
-  - Por padrão, usamos **SQLite** para simplificar a configuração. Basta ter o arquivo `database/database.sqlite`.  
+  - Por padrão, Usei **SQLite** para simplificar a configuração. Basta ter o arquivo `database/database.sqlite`.  
   - O comando `php artisan migrate` cria as tabelas, incluindo `municipios`.  
   - O import do IBGE (`php artisan importar:municipios`) preenche a tabela `municipios` uma única vez; depois, o autocomplete roda só selects simples.
 
