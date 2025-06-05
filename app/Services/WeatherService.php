@@ -10,20 +10,20 @@ use Illuminate\Support\Str;
 class WeatherService
 {
     /**
-     * Busca o clima atual de uma cidade no WeatherAPI.com.
+     * busca o clima atual de uma cidade 
      *
-     * @param string $city  Nome da cidade (ex: "São Paulo, SP" ou apenas "Curitiba")
-     * @return array|null   Dados normalizados ou null se cidade não existir
-     * @throws \Exception   Em caso de erro inesperado na API
+     * @param string $city  
+     * @return array|null  
+     * @throws \Exception  
      */
     public function getWeatherByCity(string $city): ?array
     {
-        // 2) Remover múltiplos espaços e fazer trim
+     
         $normalized = trim(preg_replace('/\s+/', ' ', $city));
-        // 3) Remover acentos/diacríticos (belem → belem, pará → para, etc.)
+      
         $cityParam = Str::ascii($normalized);
 
-        // Chave de cache única por cidade (TTL: 10 minutos)
+        // chave de cache única por cidade (TTL: 10 minutos)
         $cacheKey = "weatherapi_city_" . strtolower(str_replace(' ', '_', $cityParam));
 
         return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($cityParam) {
@@ -31,24 +31,24 @@ class WeatherService
             $apiKey  = config('services.weather.api_key');
             $lang    = config('services.weather.lang', 'pt');
 
-            // Monta a URL completa: https://api.weatherapi.com/v1/current.json
+            //  https://api.weatherapi.com/v1/current.json
             $endpoint = $baseUrl . '/current.json';
 
             try {
                 $response = Http::timeout(5)
                     ->get($endpoint, [
                         'key' => $apiKey,
-                        'q'   => $cityParam,  // já sem acentos, ex: “belem, para, Brazil”
+                        'q'   => $cityParam,  // já sem acentos
                         'lang'=> $lang,
                     ]);
 
-                // Se retornar erro HTTP (4xx ou 5xx), lança exceção
+               
                 $response->throw();
             }
             catch (RequestException $e) {
                 $status = $e->response ? $e->response->status() : null;
 
-                // 400/401/403/404 – devolve null para “cidade não encontrada”
+                // 400/401/403/404 
                 if ($status === 400 || $status === 401 || $status === 403 || $status === 404) {
                     return null;
                 }
@@ -61,7 +61,7 @@ class WeatherService
                 return null;
             }
 
-            // Normaliza os campos para a view
+            // normaliza os campos para a view
             return [
                 'name'           => $json['location']['name'] ?? $cityParam,
                 'region'         => $json['location']['region'] ?? '',

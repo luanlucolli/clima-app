@@ -8,7 +8,7 @@ use App\Models\Municipio;
 class MunicipioController extends Controller
 {
     /**
-     * GET /municipios?q=XXX
+     * get /municipios?q=XXX
      * Retorna até 10 municípios cujo 'nome' contenha o termo,
      * ordenados alfabeticamente.
      */

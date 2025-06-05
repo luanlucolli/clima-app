@@ -16,38 +16,38 @@ class WeatherController extends Controller
     }
 
     /**
-     * Rota GET '/'
-     * - Se não houver parâmetros 'cidade' e 'estado' na query, exibe só o formulário.
-     * - Se 'cidade' e 'estado' vierem na query, chama o WeatherService e exibe o resultado.
+     * Rota get '/'
+     * - Se não houver parametros cidade e estado na query, exibe só o formulário.
+     * - Se cidade e estado vierem na query, chama o WeatherService e exibe o resultado.
      *
      * @param Request $request
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function index(Request $request)
     {
-        // Verifica se há parâmetros cidade e estado na query string
+        // verifica se há parametros cidade e estado na query string
         $cidadeParam = $request->query('cidade');
         $estadoParam = $request->query('estado');
 
-        // Se não vierem, apenas exibe a página com o formulário
+        // se nao vierem, apenas exibe a página com o formulário
         if (!$cidadeParam || !$estadoParam) {
             return view('weather.index');
         }
 
-        // Monta a string de busca para o WeatherAPI ("Cidade, Estado, Brazil")
+        // monta a string de busca para o weatherapi ("Cidade, Estado, Brazil")
         $consulta = "{$cidadeParam}, {$estadoParam}, Brazil";
 
         try {
             $dadosClima = $this->weatherService->getWeatherByCity($consulta);
 
             if (is_null($dadosClima)) {
-                // Se não encontrou dados, redireciona sem query, com toast de erro
+                // se não encontrou dados, redireciona sem query, com toast de erro
                 return redirect()
                     ->route('weather.index')
                     ->with('toast_error', "Não foi possível encontrar dados para '{$cidadeParam}'.");
             }
 
-            // Se obteve dados, exibe a mesma view, passando $dados,
+            // se obteve dados, exibe a mesma view, passando $dados,
             // e flash de sucesso (o toast será disparado no Blade).
             return view('weather.index', [
                 'dados' => $dadosClima,
@@ -62,9 +62,9 @@ class WeatherController extends Controller
     }
 
     /**
-     * Rota POST '/buscar'
-     * - Recebe o POST do formulário (via WeatherRequest).
-     * - Redireciona para GET '/', adicionando 'cidade' e 'estado' na query string.
+     * Rota post '/buscar'
+     * 
+     * 
      *
      * @param WeatherRequest $request
      * @return \Illuminate\Http\RedirectResponse
@@ -74,7 +74,7 @@ class WeatherController extends Controller
         $cidade  = $request->input('cidade_selected');
         $estado  = $request->input('uf_selected');
 
-        // Redireciona para a mesma rota index, agora como GET, passando os parâmetros
+        // redireciona para a mesma rota index como get, passando os parâmetros
         return redirect()
             ->route('weather.index', [
                 'cidade' => $cidade,
