@@ -83,13 +83,8 @@ if (preg_match('/^WEATHER_API_KEY\s*=\s*(.*)$/m', $envContent, $matches)) {
     file_put_contents('.env', $envContent . $linha);
 }
 
-// 4) Gerar chave de aplicação (se ainda não houver)
-$envContent = file_get_contents('.env');
-if (!preg_match('/^APP_KEY\s*=\s*.+$/m', $envContent)) {
-    run('php artisan key:generate --ansi');
-} else {
-    echo ">>> APP_KEY já existente, pulando key:generate.\n";
-}
+echo ">>> Gerando APP_KEY com artisan key:generate\n";
+run('php artisan key:generate --ansi');
 
 // 5) php artisan migrate
 run('php artisan migrate --force --ansi');
