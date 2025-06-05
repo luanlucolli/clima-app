@@ -16,19 +16,22 @@
 
     <main class="py-4">
         <div class="container">
-            <!-- Exibe mensagem de erro, se existir -->
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
-
             @yield('content')
         </div>
     </main>
 
+    <!-- Container de toasts (Bootstrap 5) -->
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3">
+            <!-- Os toasts serão inseridos aqui via showToast -->
+        </div>
+    </div>
+
     <footer class="text-center py-3 text-muted">
         © {{ date('Y') }} Clima Já
     </footer>
+
+    <!-- Empilha quaisquer scripts (por ex. toasts) -->
+    @stack('scripts')
 </body>
 </html>
