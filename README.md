@@ -2,7 +2,7 @@
 
 Fala dev,
 
-Esse projeto foi feito com foco em clareza, simplicidade e boa prática — especialmente pra facilitar a vida de quem for rodar e testar a aplicação. Aqui vão as instruções de uso e o que acontece por trás do `setup.php`, pra ninguém perder tempo e já sair testando.
+Esse projeto foi feito com foco em clareza, simplicidade e boa prática, especialmente pra facilitar a vida de quem for rodar e testar a aplicação. Aqui vão as instruções de uso e o que acontece por trás do `setup.php`, pra ninguém perder tempo e já sair testando.
 
 ---
 
