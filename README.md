@@ -102,7 +102,7 @@ Aqui vai um resumo rápido de como tudo está organizado e funcionando:
 
 - **Dados de clima (WeatherAPI)**:  
   - Escolhi a **WeatherAPI.com** porque, dentre as APIs testadas, ela oferece cobertura confiável para cidades brasileiras, incluindo casos de nomes duplicados em estados diferentes.  
-  - Algumas cidades muito pequenas (população < 5k) podem retornar inconsistências ou não aparecer, mas isso é raro e faz parte das limitações do provider de dados gratuitos.  
+  - Algumas cidades muito pequenas (população < 5k) podem retornar inconsistências ou retornar uma próxima no lugar (vizinha), mas isso é raro e faz parte das limitações do provider de dados gratuitos.  
   - A requisição traz informações como temperatura, sensação térmica, umidade, vento, nuvens, ícone e descrição do clima em português.
 
 - **Frontend e responsividade**:  
