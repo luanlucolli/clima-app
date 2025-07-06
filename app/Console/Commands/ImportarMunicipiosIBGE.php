@@ -11,7 +11,7 @@ class ImportarMunicipiosIBGE extends Command
     // Nome do comando
     protected $signature = 'importar:municipios';
 
-    // Descrição curta
+   
     protected $description = 'Importa lista de municípios do IBGE para a tabela local';
 
     public function handle()
@@ -39,7 +39,7 @@ class ImportarMunicipiosIBGE extends Command
         $bar->start();
 
         foreach ($municipios as $item) {
-            // Cada $item contém chaves: "municipio-id", "municipio-nome", "UF-sigla", "UF-nome", entre outras
+           
             $ibgeId = $item['municipio-id'];
             $nome   = $item['municipio-nome'];
             $ufSigla = $item['UF-sigla'];

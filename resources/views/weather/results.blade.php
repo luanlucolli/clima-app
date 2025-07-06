@@ -6,7 +6,7 @@
 
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
-                <!-- Cabeçalho: cidade, estado e país -->
+        
                 <h5 class="card-title mb-3">
                     {{ $dados['name'] }}
                     @if($dados['region'])
@@ -16,7 +16,7 @@
                     - {{ $dados['country'] }}
                     @endif
                 </h5>
-                <!-- Exibição do horário local, se disponível -->
+              
                 @if($dados['localtime'])
                 <p class="text-muted small mb-4">
                     Horário local: {{ $dados['localtime'] }}
@@ -24,7 +24,7 @@
                 @endif
 
                 <div class="row align-items-center">
-                    <!-- Coluna do ícone e descrição -->
+                  
                     <div class="col-sm-4 text-center d-flex flex-column align-items-center justify-content-center">
                         @if($dados['condition_icon'])
                         <img src="{{ $dados['condition_icon'] }}"
@@ -36,7 +36,7 @@
                         @endif
                     </div>
 
-                    <!-- Coluna com detalhes numéricos -->
+                   
                     <div class="col-sm-8">
                         <ul class="list-unstyled">
                             @if(!is_null($dados['temp_c']))

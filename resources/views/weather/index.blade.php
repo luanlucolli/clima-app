@@ -9,7 +9,7 @@
 
                 {{-- Container com position-relative abrange input + botão --}}
                 <div class="d-flex position-relative">
-                    <!-- Campo de autocomplete (flex-grow-1 faz ocupar todo o espaço disponível) -->
+                  
                     <input
                         type="text"
                         id="cidade_autocomplete"
@@ -24,7 +24,7 @@
                         </div>
                     @enderror
 
-                    <!-- Botão de busca, sem flex-grow para ficar ao lado direito -->
+                  
                     <button class="btn btn-primary" type="submit" id="btn-buscar" style="border-radius: 0 0.375rem 0.375rem 0;">
                         <i class="bi bi-search"></i> Buscar
                     </button>
@@ -36,7 +36,7 @@
                         style="top: 100%; left: 0; z-index: 1050; max-height: 240px; overflow-y: auto;"></div>
                 </div>
 
-                <!-- Campos ocultos que serão submetidos -->
+               
                 <input type="hidden" id="cidade_selected" name="cidade_selected" value="{{ old('cidade_selected') }}">
                 <input type="hidden" id="uf_selected" name="uf_selected" value="{{ old('uf_selected') }}">
             </form>

@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Municipio extends Model
 {
-    // Nome da tabela
+    // nome da tabela
     protected $table = 'municipios';
 
-    // Sem timestamps automáticos
+   
     public $timestamps = false;
 
-    // Campos que podem ser preenchidos em massa
+    // campos 
     protected $fillable = [
         'ibge_id',
         'nome',

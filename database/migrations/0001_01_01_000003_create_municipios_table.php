@@ -9,12 +9,12 @@ class CreateMunicipiosTable extends Migration
     public function up()
     {
         Schema::create('municipios', function (Blueprint $table) {
-            $table->id(); // chave primária autoincrement
+            $table->id();
             $table->unsignedBigInteger('ibge_id')->unique(); // ID oficial do IBGE
             $table->string('nome', 150);
             $table->string('uf_sigla', 2);
             $table->string('uf_nome', 100);
-            // índices para acelerar a busca por nome (LIKE)
+           
             $table->index('nome');
             $table->index('uf_sigla');
         });
