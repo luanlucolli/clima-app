@@ -98,7 +98,7 @@ run('npm install');
 // 8) npm run dev
 run('npm run build');
 
-run('artisan config:clear');
+
 
 echo "\n>>> Setup concluído! Agora basta executar:\n";
 echo "    php artisan serve\n";
