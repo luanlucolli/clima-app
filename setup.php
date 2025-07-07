@@ -98,6 +98,8 @@ run('npm install');
 // 8) npm run dev
 run('npm run build');
 
+run('artisan config:clear');
+
 echo "\n>>> Setup concluído! Agora basta executar:\n";
 echo "    php artisan serve\n";
 echo "E abrir no navegador: http://127.0.0.1:8000\n\n";
